@@ -1,0 +1,49 @@
+server:
+  port: 8010
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/music_user?serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 39.97.108.189:8848
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+        port: 8719
+  application:
+    name: music-user
+  # 邮件配置
+  mail:
+    username: topjia@vip.qq.com
+    password: ezbbpfrxhizdiiaj
+    host: smtp.qq.com
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+  redis:
+    host: 39.97.108.189
+    port: 6379
+    database: 1 # 一号数据库专门用于 存放验证码信息
+
+
+mail:
+  fromMail:
+    addr: topjia@vip.qq.com
+
+# 日志
+logging:
+  level:
+    com:
+      topjia:
+        music:
+          user:
+            dao:
+              mapper: debug
