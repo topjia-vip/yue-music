@@ -1,6 +1,7 @@
 package com.topjia.music.request.controller.search;
 
 import com.alibaba.fastjson.JSONObject;
+import com.topjia.music.common.domain.dto.result.RequestData;
 import com.topjia.music.request.security.RequestException;
 import com.topjia.music.request.service.SearchService;
 import com.topjia.music.request.util.HandleReqData;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
  * @author wjh
  * @date 2019-12-20 15:02
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/search")
 @Slf4j
@@ -27,9 +27,9 @@ public class SearchController {
      * @return JSONObject
      */
     @PostMapping("/getHotKey")
-    public JSONObject hotKey(String reqData) {
+    public JSONObject hotKey(@RequestBody RequestData reqData) {
         try {
-            return (JSONObject) HandleReqData.sendRequest(reqData);
+            return (JSONObject) HandleReqData.sendRequest(reqData.getReqData());
         } catch (Exception e) {
             log.error("获取热搜失败:{}", e.getMessage());
             throw new RequestException();
@@ -43,9 +43,9 @@ public class SearchController {
      * @return HashMap
      */
     @PostMapping("/smartsearch")
-    public JSONObject smartSearch(String reqData) {
+    public JSONObject smartSearch(@RequestBody RequestData reqData) {
         try {
-            return (JSONObject) HandleReqData.sendRequest(reqData);
+            return (JSONObject) HandleReqData.sendRequest(reqData.getReqData());
         } catch (Exception e) {
             log.error("迷你搜索失败:{}", e.getMessage());
             throw new RequestException();
@@ -59,9 +59,9 @@ public class SearchController {
      * @return Object
      */
     @PostMapping("/song")
-    public Object searchSong(String reqData) {
+    public Object searchSong(@RequestBody RequestData reqData) {
         try {
-            return this.searchService.searchSong(reqData);
+            return this.searchService.searchSong(reqData.getReqData());
         } catch (Exception e) {
             log.error("单曲搜索失败:{}", e.getMessage());
             throw new RequestException();

@@ -3,6 +3,7 @@ package com.topjia.music.music.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.topjia.music.common.domain.dto.result.BaseResult;
+import com.topjia.music.common.domain.dto.result.RequestData;
 import com.topjia.music.common.domain.dto.result.ResultDTO;
 import com.topjia.music.common.domain.enums.ResultEnum;
 import com.topjia.music.common.util.AesDecryptUtil;
@@ -28,7 +29,6 @@ import java.util.List;
  * @author topjia
  * @since 2020-06-07
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/music/song")
 @Slf4j
@@ -45,10 +45,10 @@ public class SongController {
      */
     @PostMapping("/save")
     @CheckLogin
-    public BaseResult saveSong(String reqData, HttpServletRequest request) {
+    public BaseResult saveSong(@RequestBody RequestData reqData, HttpServletRequest request) {
         UserDTO userDTO = (UserDTO) request.getAttribute("user");
         // 解密数据
-        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData);
+        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData.getReqData());
         JSONObject songDTOJSON = JSONObject.parseObject(decryptUtil.getAesDecrypt());
         Song song = Song.builder()
                 .id(songDTOJSON.getInteger("id"))
@@ -94,9 +94,9 @@ public class SongController {
      */
     @PostMapping("/delete")
     @CheckLogin
-    public BaseResult deleteSong(String reqData, HttpServletRequest request) {
+    public BaseResult deleteSong(@RequestBody RequestData reqData, HttpServletRequest request) {
         UserDTO userDTO = (UserDTO) request.getAttribute("user");
-        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData);
+        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData.getReqData());
         String songID = decryptUtil.getAesDecrypt();
         log.info("用户{}取消收藏的歌曲ID为{}", userDTO, songID);
         int i = this.songService.deleteSongBySongId(userDTO.getId(), Integer.parseInt(songID));

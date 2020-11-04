@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2020-08-01 18:02
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/user1")
 @Slf4j
 public class RegisterController {

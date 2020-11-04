@@ -1,5 +1,6 @@
 package com.topjia.music.request.controller.singer;
 
+import com.topjia.music.common.domain.dto.result.RequestData;
 import com.topjia.music.request.security.RequestException;
 import com.topjia.music.request.service.SingerService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import java.util.HashMap;
  * @author wjh
  * @date 2019-12-10 20:47
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/singer")
 @Slf4j
@@ -27,10 +27,10 @@ public class SingerController {
      * @return Object
      */
     @PostMapping("/getSingerList")
-    public Object getSingerList(String reqData) {
+    public Object getSingerList(@RequestBody RequestData reqData) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            HashMap<String, Object> singerList = singerService.getSingerList(reqData);
+            HashMap<String, Object> singerList = singerService.getSingerList(reqData.getReqData());
             result.put("code", 0);
             result.put("data", singerList);
             return result;
@@ -47,10 +47,10 @@ public class SingerController {
      * @return Object
      */
     @PostMapping("/songlist")
-    public Object getSingerSongList(String reqData) {
+    public Object getSingerSongList(@RequestBody RequestData reqData) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            HashMap<String, Object> data = singerService.getSingerSongList(reqData);
+            HashMap<String, Object> data = singerService.getSingerSongList(reqData.getReqData());
             result.put("code", 0);
             result.put("data", data);
             return result;
@@ -67,10 +67,10 @@ public class SingerController {
      * @return Object
      */
     @PostMapping("/albums")
-    public Object getSingerAlbums(String reqData) {
+    public Object getSingerAlbums(@RequestBody RequestData reqData) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            HashMap<String, Object> data = singerService.getSingerAlbums(reqData);
+            HashMap<String, Object> data = singerService.getSingerAlbums(reqData.getReqData());
             result.put("code", 0);
             result.put("data", data);
             return result;
@@ -88,10 +88,10 @@ public class SingerController {
      * @return Object
      */
     @PostMapping("/concern")
-    public Object getSingerConcern(String reqData, String singerMid) {
+    public Object getSingerConcern(@RequestBody RequestData reqData, String singerMid) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            HashMap<String, Object> data = singerService.getSingerConcern(reqData, singerMid);
+            HashMap<String, Object> data = singerService.getSingerConcern(reqData.getReqData(), singerMid);
             result.put("code", 0);
             result.put("data", data);
             return result;
@@ -108,10 +108,10 @@ public class SingerController {
      * @return Object
      */
     @PostMapping("/info")
-    public Object getSingerInfo(String reqData) {
+    public Object getSingerInfo(@RequestBody RequestData reqData) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            HashMap<String, Object> data = singerService.getSingerInfo(reqData);
+            HashMap<String, Object> data = singerService.getSingerInfo(reqData.getReqData());
             result.put("code", 0);
             result.put("data", data);
             return result;

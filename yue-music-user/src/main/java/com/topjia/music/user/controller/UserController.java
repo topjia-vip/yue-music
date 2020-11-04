@@ -2,8 +2,8 @@ package com.topjia.music.user.controller;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.topjia.music.common.domain.dto.result.BaseResult;
+import com.topjia.music.common.domain.dto.result.RequestData;
 import com.topjia.music.common.domain.dto.result.ResultDTO;
 import com.topjia.music.common.domain.enums.ResultEnum;
 import com.topjia.music.common.util.AesDecryptUtil;
@@ -15,7 +15,6 @@ import com.topjia.music.user.service.UserService;
 import com.topjia.music.user.util.AccountType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -36,36 +34,11 @@ import java.util.Objects;
  * @since 2020-06-02
  */
 @RestController
-@CrossOrigin
 @RequestMapping("/user")
 @Slf4j
 public class UserController {
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
-    /**
-     * 注册服务
-     *
-     * @param reqData 前端加密参数
-     * @return ResultDTO
-     */
-    @PostMapping("/register")
-    public BaseResult userRegister(String reqData) {
-        // 解密数据
-        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData);
-        JSONObject UserDTOJSON = JSONObject.parseObject(decryptUtil.getAesDecrypt());
-        UserLoginDTO userDTO = UserLoginDTO
-                .builder()
-                .userPassword((UserDTOJSON.getString("userPassword")))
-                .userTelephoneNum(UserDTOJSON.getString("userTelephoneNum"))
-                .build();
-        log.info("待注册的用户信息:{}", userDTO);
-        // 调用注册服务
-        return userService.saveUser(userDTO);
-    }
 
     /**
      * 用户登录服务
@@ -74,8 +47,8 @@ public class UserController {
      * @return ResultDTO
      */
     @PostMapping("/login")
-    public BaseResult login(String reqData) {
-        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData);
+    public BaseResult login(@RequestBody RequestData reqData) {
+        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData.getReqData());
         JSONObject UserDTOJSON = JSONObject.parseObject(decryptUtil.getAesDecrypt());
         // 判断账号类型(手机号、邮箱)
         String type = AccountType.accountType(UserDTOJSON.getString("account"));
@@ -145,8 +118,8 @@ public class UserController {
 
     @PostMapping("/update")
     @CheckLogin
-    public BaseResult modifyUser(String reqData) {
-        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData);
+    public BaseResult modifyUser(@RequestBody RequestData reqData) {
+        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData.getReqData());
         JSONObject userDTOJSON = JSONObject.parseObject(decryptUtil.getAesDecrypt());
         User user = User.builder()
                 .id(userDTOJSON.getInteger("id"))
@@ -161,8 +134,8 @@ public class UserController {
 
     @PostMapping("/check_name")
     @CheckLogin
-    public BaseResult checkNickName(String reqData) {
-        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData);
+    public BaseResult checkNickName(@RequestBody RequestData reqData) {
+        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData.getReqData());
         String nickName = decryptUtil.getAesDecrypt();
         return userService.selectByNick(nickName);
     }
