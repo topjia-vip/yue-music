@@ -6,10 +6,7 @@ import com.topjia.music.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author topjia
@@ -24,7 +21,7 @@ public class RegisterController {
     private UserService userService;
 
     @PostMapping("/emil/register")
-    public BaseResult registerByEmil(UserRegisterDTO registerDTO) {
+    public BaseResult registerByEmil(@RequestBody UserRegisterDTO registerDTO) {
         log.info("{}", registerDTO);
         return userService.registerByEmil(registerDTO);
     }
