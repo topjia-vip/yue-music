@@ -1,5 +1,6 @@
 package com.topjia.music.request.controller.recommend;
 
+import com.topjia.music.common.domain.dto.result.RequestData;
 import com.topjia.music.request.security.RequestException;
 import com.topjia.music.request.service.RecommendBaseService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,6 @@ import java.util.HashMap;
  * @author wjh
  * @date 2019-12-08 14:24
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/recommend")
 @Slf4j
@@ -24,10 +24,11 @@ public class RecommendBaseController {
 
     // 获取焦点图
     @PostMapping("/getfocus")
-    public Object getRecommendFocus(String reqData) {
+    public Object getRecommendFocus(@RequestBody RequestData reqData) {
+        log.info("{}", reqData);
         HashMap<String, Object> result = new HashMap<>();
         try {
-            Object res = recommendBaseService.getRecommendFocus(reqData);
+            Object res = recommendBaseService.getRecommendFocus(reqData.getReqData());
             result.put("code", 0);
             result.put("data", res);
             return result;
@@ -39,10 +40,10 @@ public class RecommendBaseController {
 
     //获取推荐歌单、最新音乐
     @PostMapping("/getplaylistandmusic")
-    public Object getRecommendPlayListAndNewMusic(String reqData) {
+    public Object getRecommendPlayListAndNewMusic(@RequestBody RequestData reqData) {
         HashMap<String, Object> result = new HashMap<>();
         try {
-            Object res = recommendBaseService.getRecommendPlayListAndNewMusic(reqData);
+            Object res = recommendBaseService.getRecommendPlayListAndNewMusic(reqData.getReqData());
             result.put("code", 0);
             result.put("data", res);
             return result;
@@ -54,10 +55,10 @@ public class RecommendBaseController {
 
     // 获取最新音乐
     @PostMapping("/getnewsong")
-    public Object getNewSong(String reqData) {
+    public Object getNewSong(@RequestBody RequestData reqData) {
         HashMap<String, Object> result = new HashMap<>();
         try {
-            Object res = recommendBaseService.getNewSong(reqData);
+            Object res = recommendBaseService.getNewSong(reqData.getReqData());
             result.put("code", 0);
             result.put("data", res);
             return result;

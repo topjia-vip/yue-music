@@ -3,6 +3,7 @@ package com.topjia.music.music.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.topjia.music.common.domain.dto.result.BaseResult;
+import com.topjia.music.common.domain.dto.result.RequestData;
 import com.topjia.music.common.domain.dto.result.ResultDTO;
 import com.topjia.music.common.domain.enums.ResultEnum;
 import com.topjia.music.common.util.AesDecryptUtil;
@@ -25,7 +26,6 @@ import java.util.List;
  * @author topjia
  * @since 2020-06-10
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/music/disst")
 @Slf4j
@@ -42,10 +42,10 @@ public class DisstController {
      */
     @PostMapping("/save")
     @CheckLogin
-    public BaseResult saveDisst(String reqData, HttpServletRequest request) {
+    public BaseResult saveDisst(@RequestBody RequestData reqData, HttpServletRequest request) {
         UserDTO userDTO = (UserDTO) request.getAttribute("user");
         // 解密数据
-        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData);
+        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData.getReqData());
         JSONObject disstDTOJSON = JSONObject.parseObject(decryptUtil.getAesDecrypt());
         Disst disst = Disst.builder()
                 .disstId(disstDTOJSON.getString("disstId"))
@@ -75,9 +75,9 @@ public class DisstController {
 
     @PostMapping("/delete")
     @CheckLogin
-    public BaseResult deleteDisst(String reqData, HttpServletRequest request) {
+    public BaseResult deleteDisst(@RequestBody RequestData reqData, HttpServletRequest request) {
         UserDTO userDTO = (UserDTO) request.getAttribute("user");
-        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData);
+        AesDecryptUtil decryptUtil = new AesDecryptUtil(reqData.getReqData());
         String disstId = decryptUtil.getAesDecrypt();
         log.info("用户{}取消收藏的歌单ID为{}", userDTO, disstId);
         this.disstService.deleteDisstByDisstId(userDTO.getId(), disstId);

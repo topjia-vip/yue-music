@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @RestController
-@CrossOrigin
 @RequestMapping("/checkcode")
 public class CheckCodeController {
 

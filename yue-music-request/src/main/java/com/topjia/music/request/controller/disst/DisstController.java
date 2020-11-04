@@ -1,5 +1,6 @@
 package com.topjia.music.request.controller.disst;
 
+import com.topjia.music.common.domain.dto.result.RequestData;
 import com.topjia.music.request.entity.disst.Disst;
 import com.topjia.music.request.entity.disst_category_group.DisstCategoryGroup;
 import com.topjia.music.request.entity.song.Song;
@@ -17,7 +18,6 @@ import java.util.*;
  * @author wjh
  * @date 2019-12-19 17:00
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/disst")
 @Slf4j
@@ -29,10 +29,10 @@ public class DisstController {
      * 获取歌单的分类标签
      */
     @PostMapping("/disstcategorygroup")
-    public Object disstCategoryGroup(String reqData) {
+    public Object disstCategoryGroup(@RequestBody RequestData reqData) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            List<DisstCategoryGroup> categoryGroups = disstService.getDisstCategoryGroup(reqData);
+            List<DisstCategoryGroup> categoryGroups = disstService.getDisstCategoryGroup(reqData.getReqData());
             result.put("code", 0);
             result.put("categoryGroups", categoryGroups);
             return result;
@@ -46,10 +46,10 @@ public class DisstController {
      * 获取标签下的歌单列表(可分页)
      */
     @PostMapping("/disstlist")
-    public Object disstList(String reqData) {
+    public Object disstList(@RequestBody RequestData reqData) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            Map<String, Object> dissts = disstService.getDisstList(reqData);
+            Map<String, Object> dissts = disstService.getDisstList(reqData.getReqData());
             result.put("code", 0);
             result.put("data", dissts);
             return result;
@@ -64,10 +64,10 @@ public class DisstController {
      * 查看某个歌单的详情信息
      */
     @PostMapping("/disstDetail")
-    public Object disstDetail(String reqData) {
+    public Object disstDetail(@RequestBody RequestData reqData) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            Disst disst = disstService.getDisstDetail(reqData);
+            Disst disst = disstService.getDisstDetail(reqData.getReqData());
             result.put("code", 0);
             result.put("disst", disst);
             return result;
@@ -81,10 +81,10 @@ public class DisstController {
      * 歌单详情的歌曲列表
      */
     @PostMapping("/disstsonglist")
-    public Object disstSongList(String reqData) {
+    public Object disstSongList(@RequestBody RequestData reqData) {
         try {
             HashMap<String, Object> result = new HashMap<>();
-            List<Song> songs = disstService.getDisstSongList(reqData);
+            List<Song> songs = disstService.getDisstSongList(reqData.getReqData());
             result.put("code", 0);
             result.put("songs", songs);
             return result;
