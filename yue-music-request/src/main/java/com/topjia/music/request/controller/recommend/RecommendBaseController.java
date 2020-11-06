@@ -25,7 +25,6 @@ public class RecommendBaseController {
     // 获取焦点图
     @PostMapping("/getfocus")
     public Object getRecommendFocus(@RequestBody RequestData reqData) {
-        log.info("{}", reqData);
         HashMap<String, Object> result = new HashMap<>();
         try {
             Object res = recommendBaseService.getRecommendFocus(reqData.getReqData());

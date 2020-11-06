@@ -7,6 +7,7 @@ import com.topjia.music.request.entity.song.Song;
 import com.topjia.music.request.entity.top.*;
 import com.topjia.music.request.service.RankService;
 import com.topjia.music.request.util.HandleReqData;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -17,6 +18,7 @@ import java.util.*;
  * @date 2020-05-24 18:02
  */
 @Service
+@Slf4j
 public class RankServiceImpl implements RankService {
     @Override
     public List<TopGroup> getTopListInfo(String reqData) throws Exception {
