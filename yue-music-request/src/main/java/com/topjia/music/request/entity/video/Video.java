@@ -66,6 +66,11 @@ public class Video {
      * 演出歌手
      */
     private List<Singer> singers;
+
+    /**
+     * 上传者昵称
+     */
+    private String uploaderNick;
 }
 
 

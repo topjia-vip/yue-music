@@ -96,4 +96,32 @@ public class VideoController {
             throw new RequestException();
         }
     }
+
+    @PostMapping("/video_play_url")
+    public Object getVideoPlayUrl(@RequestBody RequestData reqData, String vid) {
+        try {
+            HashMap<String, Object> result = new HashMap<>();
+            HashMap<String, Object> videoUrl = videoService.getVideoPlayUrl(reqData.getReqData(), vid);
+            result.put("code", 0);
+            result.put("videoUrl", videoUrl);
+            return result;
+        } catch (Exception e) {
+            log.error("获取视频播放链接失败:{}", e.getMessage());
+            throw new RequestException();
+        }
+    }
+
+    @PostMapping("/video_info_other")
+    public Object getVideoInfoAndOtherVideo(@RequestBody RequestData reqData, String vid) {
+        try {
+            HashMap<String, Object> result = new HashMap<>();
+            HashMap<String, Object> data = videoService.getVideoInfoAndOtherVideo(reqData.getReqData(), vid);
+            result.put("code", 0);
+            result.put("data", data);
+            return result;
+        } catch (Exception e) {
+            log.error("获取视频播放链接失败:{}", e.getMessage());
+            throw new RequestException();
+        }
+    }
 }

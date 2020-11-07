@@ -5,10 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.topjia.music.request.entity.singer.Singer;
 import com.topjia.music.request.entity.top.RankSong;
 import com.topjia.music.request.entity.top.Top;
-import com.topjia.music.request.entity.top.TopGroup;
 import com.topjia.music.request.entity.video.Video;
 import com.topjia.music.request.service.VideoService;
+import com.topjia.music.request.util.AesUtil;
 import com.topjia.music.request.util.HandleReqData;
+import com.topjia.music.request.util.HttpSendUtil;
 import com.topjia.music.request.util.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -99,6 +100,160 @@ public class VideoServiceImpl implements VideoService {
         RequestHeader header = new RequestHeader("u.y.qq.com", "https://y.qq.com/", "");
         JSONObject response = (JSONObject) HandleReqData.sendRequest(reqData, header);
         return handleVideos(response);
+    }
+
+    @Override
+    public HashMap<String, Object> getVideoPlayUrl(String reqData, String vid) throws Exception {
+        String url = "https://u.y.qq.com/cgi-bin/musicu.fcg";
+        String requestData = AesUtil.aesDecrypt(reqData);
+        JSONObject response = (JSONObject) HttpSendUtil.sendPostByForm(url, requestData);
+        return handleVideoUrl(response, vid);
+    }
+
+    @Override
+    public HashMap<String, Object> getVideoInfoAndOtherVideo(String reqData, String vid) throws Exception {
+        RequestHeader header = new RequestHeader("u.y.qq.com", "https://y.qq.com/", "");
+        JSONObject response = (JSONObject) HandleReqData.sendRequest(reqData, header);
+        return handleData(response, vid);
+    }
+
+    private HashMap<String, Object> handleData(JSONObject response, String vid) {
+        HashMap<String, Object> res = new HashMap<>();
+        // 1、获取Video信息
+        JSONObject mvInfoJsonObj = response.getJSONObject("mvinfo").getJSONObject("data").getJSONObject(vid);
+        ArrayList<Singer> singers = new ArrayList<>();
+        JSONArray singersJSONArr = mvInfoJsonObj.getJSONArray("singers");
+        singersJSONArr.forEach((singerObj) -> {
+            JSONObject singerJSONObj = (JSONObject) singerObj;
+            Singer singer = new Singer();
+            singer.setSingerId(singerJSONObj.getInteger("id"));
+            singer.setSingerMid(singerJSONObj.getString("mid"));
+            singer.setSingerName(singerJSONObj.getString("name"));
+            singer.setSingerPic("https://y.gtimg.cn/music/photo_new/T001R300x300M000" + singerJSONObj.getString("mid") + ".jpg?max_age=2592000");
+            singers.add(singer);
+        });
+        Video video = Video.builder()
+                .duration(mvInfoJsonObj.getInteger("duration"))
+                .vid(mvInfoJsonObj.getString("vid"))
+                .singers(singers)
+                .mvPicUrl(mvInfoJsonObj.getString("cover_pic"))
+                .listenNum(mvInfoJsonObj.getInteger("playcnt"))
+                .createTime(mvInfoJsonObj.getString("pubdate"))
+                .mvTitle(mvInfoJsonObj.getString("name"))
+                .mvDesc(mvInfoJsonObj.getString("desc"))
+                .build();
+        res.put("videoInfo", video);
+
+        // 2、获取Video相关MV信息
+        JSONArray otherMvJsonArr = response.getJSONObject("other").getJSONObject("data").getJSONArray("list");
+        ArrayList<Video> videos = new ArrayList<>();
+        otherMvJsonArr.forEach((item) -> {
+            JSONObject otherMvJsonObj = (JSONObject) item;
+            ArrayList<Singer> singersList = new ArrayList<>();
+            JSONArray singersJSONArray = otherMvJsonObj.getJSONArray("singers");
+            if (singersJSONArray.size() > 0) {
+                singersJSONArray.forEach((singerObj) -> {
+                    JSONObject singerJSONObj = (JSONObject) singerObj;
+                    Singer singer = new Singer();
+                    singer.setSingerId(singerJSONObj.getInteger("id"));
+                    singer.setSingerMid(singerJSONObj.getString("mid"));
+                    singer.setSingerName(singerJSONObj.getString("name"));
+                    singer.setSingerPic("https://y.gtimg.cn/music/photo_new/T001R300x300M000" + singerJSONObj.getString("mid") + ".jpg?max_age=2592000");
+                    singersList.add(singer);
+                });
+            }
+
+            Video otherVideo = Video.builder()
+                    .duration(otherMvJsonObj.getInteger("duration"))
+                    .vid(otherMvJsonObj.getString("vid"))
+                    .mvPicUrl(otherMvJsonObj.getString("cover_pic"))
+                    .listenNum(otherMvJsonObj.getInteger("playcnt"))
+                    .createTime(otherMvJsonObj.getString("pubdate"))
+                    .mvTitle(otherMvJsonObj.getString("name"))
+                    .mvDesc(otherMvJsonObj.getString("desc"))
+                    .uploaderNick(otherMvJsonObj.getString("uploader_nick"))
+                    .singers(singersList)
+                    .build();
+            videos.add(otherVideo);
+        });
+        res.put("otherVideos", videos);
+        return res;
+    }
+
+    private HashMap<String, Object> handleVideoUrl(JSONObject response, String vid) {
+        ArrayList<HashMap<String, Object>> urls = new ArrayList<>();
+        JSONArray videoUrlJsonArr = response.getJSONObject("getMvUrl").getJSONObject("data").getJSONObject(vid).getJSONArray("mp4");
+        HashMap<String, Object> defaultUrlMap = new HashMap<>();
+        JSONObject defaultUrlJsonObj = (JSONObject) videoUrlJsonArr.get(0);
+        HashMap<String, Object> res = new HashMap<>();
+        for (Object item : videoUrlJsonArr) {
+            HashMap<String, Object> urlMap = new HashMap<>();
+            JSONObject urlJsonObj = (JSONObject) item;
+            Integer fileType = urlJsonObj.getInteger("newFileType");
+            Integer defaultFileType = defaultUrlJsonObj.getInteger("newFileType");
+            if (defaultFileType <= fileType) {
+                defaultUrlJsonObj = urlJsonObj;
+            }
+            if (fileType.equals(9844)) {
+                // 蓝光 Url 1080P
+                urlMap.put("type", "蓝光");
+                urlMap.put("id", 9844);
+                String url = "https://mv.music.tc.qq.com/" + urlJsonObj.getString("vkey") + "/" + urlJsonObj.getString("cn") + "?fname=" + urlJsonObj.getString("cn");
+                urlMap.put("url", url);
+                urls.add(urlMap);
+            } else if (fileType.equals(9834)) {
+                // 超清 Url 720P
+                urlMap.put("type", "超清");
+                urlMap.put("id", 9834);
+                String url = "https://mv.music.tc.qq.com/" + urlJsonObj.getString("vkey") + "/" + urlJsonObj.getString("cn") + "?fname=" + urlJsonObj.getString("cn");
+                urlMap.put("url", url);
+                urls.add(urlMap);
+            } else if (fileType.equals(9824)) {
+                // 高清 Url 480P
+                urlMap.put("type", "高清");
+                urlMap.put("id", 9824);
+                String url = "https://mv.music.tc.qq.com/" + urlJsonObj.getString("vkey") + "/" + urlJsonObj.getString("cn") + "?fname=" + urlJsonObj.getString("cn");
+                urlMap.put("url", url);
+                urls.add(urlMap);
+            } else if (fileType.equals(9814)) {
+                // 标清 Url 360P
+                urlMap.put("type", "标清");
+                urlMap.put("id", 9814);
+                String url = "https://mv.music.tc.qq.com/" + urlJsonObj.getString("vkey") + "/" + urlJsonObj.getString("cn") + "?fname=" + urlJsonObj.getString("cn");
+                urlMap.put("url", url);
+                urls.add(urlMap);
+            }
+        }
+        defaultUrlMap.put("type", handleType(defaultUrlJsonObj));
+        defaultUrlMap.put("id", defaultUrlJsonObj.getInteger("newFileType"));
+        String url = "https://mv.music.tc.qq.com/" + defaultUrlJsonObj.getString("vkey") + "/" + defaultUrlJsonObj.getString("cn") + "?fname=" + defaultUrlJsonObj.getString("cn");
+        defaultUrlMap.put("url", url);
+        res.put("urls", urls);
+        res.put("defaultUrl", defaultUrlMap);
+        return res;
+    }
+
+    private String handleType(JSONObject defaultUrlJsonObj) {
+        String type = "";
+        switch (defaultUrlJsonObj.getInteger("newFileType")) {
+            case 9844: {
+                type = "蓝光";
+                break;
+            }
+            case 9834: {
+                type = "超清";
+                break;
+            }
+            case 9824: {
+                type = "高清";
+                break;
+            }
+            case 9814: {
+                type = "标清";
+                break;
+            }
+        }
+        return type;
     }
 
     private List<Video> handleVideos(JSONObject response) {

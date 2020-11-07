@@ -3,9 +3,13 @@ package com.topjia.music.request.util;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.*;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -137,6 +141,57 @@ public class HttpSendUtil {
         //2.1设置请求头 发送的是json数据格式
         httpPost.addHeader("Accept", "*/*");
         httpPost.addHeader("Cache-Control", "no-cache");
+
+        //4.执行http的post请求
+        CloseableHttpResponse response = null;
+        InputStream inputStream = null;
+        JSONObject jsonObject = null;
+        try {
+            response = httpClient.execute(httpPost);
+            //5.对返回的数据进行处理
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            if (SUCCESS_CODE == statusCode) {
+                HttpEntity entity = response.getEntity();
+                String result = EntityUtils.toString(entity, "UTF-8");
+                try {
+                    jsonObject = JSONObject.parseObject(result);
+                    return jsonObject;
+                } catch (Exception e) {
+                    return result;
+                }
+            } else {
+                log.error("HttpClientService-line: {}, errorMsg{}", 97, "POST请求失败！");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            response.close();
+            httpClient.close();
+        }
+        return null;
+    }
+
+
+    /**
+     * 通过post方式调用http接口
+     *
+     * @param url url路径
+     * @return
+     * @throws Exception
+     */
+    public static Object sendPostByForm(String url, String json) throws Exception {
+        //1.创建httpClient
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        URIBuilder uriBuilder = new URIBuilder(url);
+        //2.创建post请求方式实例
+        HttpPost httpPost = new HttpPost(uriBuilder.build());
+
+        //2.1设置请求头 发送的是json数据格式
+        httpPost.addHeader("Accept", "*/*");
+        httpPost.addHeader("Cache-Control", "no-cache");
+        httpPost.setEntity(new StringEntity(json));
 
         //4.执行http的post请求
         CloseableHttpResponse response = null;

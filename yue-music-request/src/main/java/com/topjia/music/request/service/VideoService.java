@@ -20,4 +20,8 @@ public interface VideoService {
     HashMap<String, Object> getVideoTags(String reqData) throws Exception;
 
     List<Video> getVideos(String reqData) throws Exception;
+
+    HashMap<String, Object> getVideoPlayUrl(String reqData, String vid) throws Exception;
+
+    HashMap<String, Object> getVideoInfoAndOtherVideo(String reqData, String vid) throws Exception;
 }
