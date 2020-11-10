@@ -8,10 +8,7 @@ import com.topjia.music.user.util.send.SendEmilUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +30,7 @@ public class CheckCodeController {
     /**
      * 发送邮箱验证码
      *
-     * @param emil 郵箱
+     * @param emil 邮箱
      * @return BaseResult
      */
     @PostMapping("/getemilcheckcode")

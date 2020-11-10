@@ -9,6 +9,7 @@ import com.topjia.music.request.entity.song.Song;
 import com.topjia.music.request.service.SingerService;
 import com.topjia.music.request.util.HandleReqData;
 import com.topjia.music.request.util.RequestHeader;
+import lombok.extern.slf4j.Slf4j;
 import org.dom4j.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -19,6 +20,7 @@ import java.util.*;
  * @author wjh
  * @date 2020-05-24 18:59
  */
+@Slf4j
 @Service
 public class SingerServiceImpl implements SingerService {
     @Override
@@ -110,6 +112,8 @@ public class SingerServiceImpl implements SingerService {
     @Override
     public HashMap<String, Object> getSingerConcern(String reqData, String singerMid) throws Exception {
         JSONObject response = (JSONObject) HandleReqData.sendRequest(reqData);
+        log.info("{}", reqData);
+        log.info("{}", singerMid);
         HashMap<String, Object> concernNum = new HashMap<>();
         concernNum.put("concernNum", response.getJSONObject("concernNum").getJSONObject("data").getJSONObject("map_singer_num").getJSONObject(singerMid).getInteger("user_fansnum"));
         return concernNum;

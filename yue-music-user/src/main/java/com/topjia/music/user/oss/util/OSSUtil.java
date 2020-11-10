@@ -16,9 +16,9 @@ import java.io.InputStream;
 @Component
 public class OSSUtil {
     private static String endpoint = "http://oss-cn-shenzhen.aliyuncs.com";
-    private static String accessKeyId = "LTAI4FnyUoemDnytueg79rGj";
-    private static String accessKeySecret = "Fw1yjywplu6AdJYvFAE6MrLLzgcsvA";
-    private static String bucketName = "topjia-oss";
+    private static String accessKeyId = ""; // 你的OSS accessKeyId
+    private static String accessKeySecret = "";// 你的OSS accessKeySecret
+    private static String bucketName = ""; // 你的 bucketName
     /**
      * OSS的文件夹名
      */
@@ -34,7 +34,7 @@ public class OSSUtil {
         OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
         try {
             ossClient.putObject(new PutObjectRequest(bucketName, folder + fileName, inputStream));
-            String lookUrl = "https://www.yt526.top/";
+            String lookUrl = ""; // 你的OSS域名，没有域名阿里OSS默认为下载 不能在线查看图片
             return lookUrl + folder + fileName;
         } catch (Exception e) {
             log.error("图片上传失败", e);

@@ -1,0 +1,10 @@
+server:
+  port: 8099
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 39.97.108.189:8848
+  application:
+    name: music-request
