@@ -1,25 +1,3 @@
-server:
-  port: 8020
-
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/music_music?serverTimezone=Asia/Shanghai
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 123456
-
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 39.97.108.189:8848
-  application:
-    name: music-music
-
-logging:
-  level:
-    com:
-      topjia:
-        music:
-          user:
-            dao:
-              mapper: debug
+  profiles:
+    active: dev
